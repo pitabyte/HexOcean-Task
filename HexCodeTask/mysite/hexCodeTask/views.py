@@ -44,30 +44,37 @@ def uploadPhoto(request):
     username = data['username']
     password = data['password']
     user = CustomUser.objects.get(username=username, password=password)
-    photo_data = request.FILES.get('photo')
-    photo = Photo(user=user, image=photo_data)
-    photo.save()
-    heights = user.tier.get_heights_list()
+
     response = {}
+    responseList = []
     baseURL = request.build_absolute_uri(reverse('index'))
 
-    for height in heights:
-        thumbnail = Thumbnail(user=user, photo=photo, height=height)
-        thumbnail.save()
-        thumbnail.appendURLtoResponse(response, baseURL)
 
-    if (user.tier.gets_original == True):
-       photo.appendURLtoResponse(response, baseURL)
+    photos = request.FILES.getlist('photos')
+    for photo_data in photos:
+        photo = Photo(user=user, image=photo_data)
+        photo.save()
 
-    if (user.tier.expiring_link == True and 'expires' in data):
-        if expiresIsValid(data['expires']):
-            binaryPhoto = BinaryPhoto(user=user, photo=photo, expires=data['expires'])
-            binaryPhoto.save()
-            binaryPhoto.appendURLtoResponse(response, baseURL)
-        else:
-            return HttpResponse('invalid "expires" value')
+        heights = user.tier.get_heights_list()
+        for height in heights:
+            thumbnail = Thumbnail(user=user, photo=photo, height=height)
+            thumbnail.save()
+            thumbnail.appendURLtoResponse(response, baseURL)
+
+        if (user.tier.gets_original == True):
+            photo.appendURLtoResponse(response, baseURL)
+
+        if (user.tier.expiring_link == True and 'expires' in data):
+            if expiresIsValid(data['expires']):
+                binaryPhoto = BinaryPhoto(user=user, photo=photo, expires=data['expires'])
+                binaryPhoto.save()
+                binaryPhoto.appendURLtoResponse(response, baseURL)
+            else:
+                return HttpResponse('invalid "expires" value')
+        responseList.append(response.copy())
+        response.clear()
     
-    return JsonResponse(response)
+    return Response(responseList)
     return Response('photo was uploaded')
 
 @api_view(['GET'])
