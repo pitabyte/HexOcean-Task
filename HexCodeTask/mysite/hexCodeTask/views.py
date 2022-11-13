@@ -6,8 +6,10 @@ from rest_framework.decorators import api_view
 from .models import Photo, CustomUser, Thumbnail, BinaryPhoto
 from .serializers import PhotoSerializer, ThumbnailSerializer, BinaryPhotoSerializer
 from PIL import Image, ImageOps
+import json
 import io
 from datetime import timezone, timedelta, datetime
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -49,6 +51,7 @@ def uploadPhoto(request):
     heights = user.tier.get_heights_list()
     baseURL = request.build_absolute_uri(reverse('index'))
     returnList = []
+    returnDict = {}
     for height in heights:
         thumbnail = Thumbnail(user=user, photo=photo, height=height)
         thumbnail.save()
@@ -56,9 +59,12 @@ def uploadPhoto(request):
         thumbnail.url = finalURL
         thumbnail.save()
         returnList.append(ThumbnailSerializer(thumbnail).data)
+        key = "thumbnail" + str(thumbnail.height)
+        returnDict[key] = finalURL
     if (user.tier.gets_original == True):
         finalURL = baseURL + "static" + photo.image.url
         returnList.append(finalURL)
+        returnDict['original'] = finalURL
     if (user.tier.expiring_link == True and data['expires'] != None):
         binaryPhoto = BinaryPhoto(user=user, photo=photo, expires=data['expires'])
         binaryPhoto.save()
@@ -66,7 +72,9 @@ def uploadPhoto(request):
         binaryPhoto.url = finalURL
         binaryPhoto.save()
         returnList.append(BinaryPhotoSerializer(binaryPhoto).data)
-    return Response(returnList)
+        returnDict['binary'] = finalURL
+    jsonResponse = json.dumps(returnDict, indent = 4)
+    return JsonResponse(returnDict)
     return Response('photo was uploaded')
 
 @api_view(['GET'])
