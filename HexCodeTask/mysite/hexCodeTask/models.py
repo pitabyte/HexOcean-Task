@@ -26,11 +26,20 @@ class Photo(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='photos', null=True)
     image = models.ImageField(null=True, blank=True)
 
+    def appendURLtoResponse(self, response, baseURL):
+        finalURL = baseURL + "static" + self.image.url
+        response['original'] = finalURL
+
 class Thumbnail(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='thumbnails', null=True)
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name='thumbnails', null=True)
     height = models.IntegerField(null=True)
     url = models.CharField(max_length=20, null=True)
+
+    def appendURLtoResponse(self, response, baseURL):
+        finalURL = baseURL + "thumbnail/" + str(self.id)
+        key = "thumbnail" + str(self.height)
+        response[key] = finalURL
 
 class BinaryPhoto(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='binary', null=True)
@@ -38,6 +47,11 @@ class BinaryPhoto(models.Model):
     url = models.CharField(max_length=20, null=True)
     expires = models.IntegerField(validators=[MinValueValidator(30), MaxValueValidator(30000)])
     date = models.DateTimeField(auto_now_add=True, null=True)
+
+    
+    def appendURLtoResponse(self, response, baseURL):
+        finalURL = baseURL + "binary/" + str(self.id)
+        response['binary'] = finalURL
 
     
 

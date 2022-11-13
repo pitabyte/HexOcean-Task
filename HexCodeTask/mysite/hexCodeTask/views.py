@@ -10,7 +10,7 @@ import json
 import io
 from datetime import timezone, timedelta, datetime
 from django.http import JsonResponse
-
+from hexCodeTask.helpers import expiresIsValid
 # Create your views here.
 
 @api_view(['GET'])
@@ -47,34 +47,27 @@ def uploadPhoto(request):
     photo_data = request.FILES.get('photo')
     photo = Photo(user=user, image=photo_data)
     photo.save()
-
     heights = user.tier.get_heights_list()
+    response = {}
     baseURL = request.build_absolute_uri(reverse('index'))
-    returnList = []
-    returnDict = {}
+
     for height in heights:
         thumbnail = Thumbnail(user=user, photo=photo, height=height)
         thumbnail.save()
-        finalURL = baseURL + "thumbnail/" + str(thumbnail.id)
-        thumbnail.url = finalURL
-        thumbnail.save()
-        returnList.append(ThumbnailSerializer(thumbnail).data)
-        key = "thumbnail" + str(thumbnail.height)
-        returnDict[key] = finalURL
+        thumbnail.appendURLtoResponse(response, baseURL)
+
     if (user.tier.gets_original == True):
-        finalURL = baseURL + "static" + photo.image.url
-        returnList.append(finalURL)
-        returnDict['original'] = finalURL
-    if (user.tier.expiring_link == True and data['expires'] != None):
-        binaryPhoto = BinaryPhoto(user=user, photo=photo, expires=data['expires'])
-        binaryPhoto.save()
-        finalURL = baseURL + "binary/" + str(binaryPhoto.id)
-        binaryPhoto.url = finalURL
-        binaryPhoto.save()
-        returnList.append(BinaryPhotoSerializer(binaryPhoto).data)
-        returnDict['binary'] = finalURL
-    jsonResponse = json.dumps(returnDict, indent = 4)
-    return JsonResponse(returnDict)
+       photo.appendURLtoResponse(response, baseURL)
+
+    if (user.tier.expiring_link == True and 'expires' in data):
+        if expiresIsValid(data['expires']):
+            binaryPhoto = BinaryPhoto(user=user, photo=photo, expires=data['expires'])
+            binaryPhoto.save()
+            binaryPhoto.appendURLtoResponse(response, baseURL)
+        else:
+            return HttpResponse('invalid "expires" value')
+    
+    return JsonResponse(response)
     return Response('photo was uploaded')
 
 @api_view(['GET'])
