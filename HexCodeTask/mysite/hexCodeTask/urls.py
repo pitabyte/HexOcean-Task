@@ -6,6 +6,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('upload/', views.uploadPhoto, name="photo-upload"),
     path('all/', views.getPhotos, name="getPhotos"),
-    path('thumbnail/<int:id>/', views.getThumbnail, name="getThumbnail"),
-    path('binary/<int:id>/', views.getBinaryPhoto, name="getBinaryPhoto")
+    path('binary/<int:id>/', views.getBinaryPhoto, name="getBinaryPhoto"),
 ]

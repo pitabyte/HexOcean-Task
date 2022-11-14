@@ -10,7 +10,7 @@ import json
 import io
 from datetime import timezone, timedelta, datetime
 from django.http import JsonResponse
-from hexCodeTask.helpers import expiresIsValid, getImageURL, extensionIsValid
+from hexCodeTask.helpers import expiresIsValid, getImageURL
 import os
 # Create your views here.
 
@@ -24,24 +24,9 @@ def getPhotos(request):
     username = data['username']
     password = data['password']
     user = CustomUser.objects.get(username=username, password=password)
-    #photos = Photo.objects.filter(user=user)
-    #serializer = PhotoSerializer(photos, many=True)
-    #return Response(serializer.data)
-    response = []
-    baseURL = request.build_absolute_uri(reverse('index'))
     photos = Photo.objects.filter(user=user)
-    thumbnails = Thumbnail.objects.filter(user=user)
-    binaries = BinaryPhoto.objects.filter(user=user)
-
-    for photo in photos:
-        response.append(photo.getURL(baseURL))
-    for thumb in thumbnails:
-        response.append(thumb.url)
-    for binary in binaries:
-        response.append(binary.url)
-
-
-    return JsonResponse(response, safe=False)
+    serializer = PhotoSerializer(photos, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def getPhoto(request, id):
@@ -63,31 +48,46 @@ def uploadPhoto(request):
     response = {}
     responseList = []
     baseURL = request.build_absolute_uri(reverse('index'))
-
+    
     photos = request.FILES.getlist('photos')
     for photo_data in photos:
         photo = Photo(user=user, image=photo_data)
-        print(photo.image.name)
-        #if not extensionIsValid(photo.getFilename()):
-            
-        if not extensionIsValid(photo.image.name):
-            return HttpResponse('invalid file format')
+        print(photo.getFilename())
         photo.save()
+
         heights = user.tier.get_heights_list()
         for height in heights:
-            photo.createThumbnailFile(height)
-            url = photo.getNewURL(baseURL, height)
+            thumbnail = createThumbnail(photo, height)
+            filename = "T" + str(height) + "-" + os.path.basename(photo.image.path)
+            dir = os.path.dirname(photo.image.path)
+            path = dir + "/" + filename
+            image.save(path, format='JPEG')
+
+            
+            key = "thumbnail" + height
+            url = getImageURL(baseURL, filename, photo)
             thumbnail = Thumbnail(user=user, photo=photo, height=height, url=url)
             thumbnail.save()
-            response["thumbnail" + height] = url
+            response[key] = url
+
 
         if (user.tier.expiring_link == True and 'expires' in data):
             if expiresIsValid(data['expires']):
-                binaryPhoto = photo.createBinary(user)
-                binaryPhoto.url = binaryPhoto.getURL(baseURL)
-                binaryPhoto.expires = data['expires']
+                
+                image = Image.open(photo.image.path)
+                grayImage = ImageOps.grayscale(image)
+                filename = "B" + str(height) + "-" + os.path.basename(photo.image.path)
+                dir = os.path.dirname(photo.image.path)
+                path = dir + "/" + filename
+                grayImage.save(path, format='JPEG')
+                key = "binary" + height
+                
+                binaryPhoto = BinaryPhoto(user=user, photo=photo, expires=data['expires'], path=path)
                 binaryPhoto.save()
-                response['binary'] = binaryPhoto.url
+                finalURL = baseURL + "binary/" + str(binaryPhoto.id)
+                binaryPhoto.url = finalURL
+                binaryPhoto.save()
+                response['binary'] = finalURL
             else:
                 return HttpResponse('invalid "expires" value')
 
@@ -95,23 +95,37 @@ def uploadPhoto(request):
             photo.appendURLtoResponse(response, baseURL)
         else:
             os.remove(photo.image.path)
+
         responseList.append(response.copy())
         response.clear()
-    #return Response(responseList)
-    return JsonResponse(responseList, safe=False)
+    
+    return Response(responseList)
     return Response('photo was uploaded')
+
+@api_view(['GET'])
+def getThumbnail(request, id):
+    thumbnail = Thumbnail.objects.get(id=id)
+    image = Image.open(thumbnail.photo.image.path)
+    ratio = image.width / image.height
+    MAX_SIZE = (thumbnail.height * ratio, thumbnail.height)
+    image.thumbnail(MAX_SIZE)
+    output = io.BytesIO()
+    image.save(output, format='JPEG')
+    print(image.width)
+    print(image.height)
+    hex_data = output.getvalue()
+    return HttpResponse(hex_data, content_type="image/jpeg")
 
 @api_view(['GET'])
 def getBinaryPhoto(request, id):
     binaryPhoto = BinaryPhoto.objects.get(id=id)
     difference = (datetime.now(timezone.utc) - binaryPhoto.date).total_seconds()
-
     if (difference < binaryPhoto.expires):
         img = open(binaryPhoto.path, 'rb')
-        response = FileResponse(img)
-        return response
-    else:
-        os.remove(binaryPhoto.path)
-        binaryPhoto.delete()
-        return HttpResponse("This image has already expired")
 
+        response = FileResponse(img)
+
+        return response
+        
+    else:
+        return HttpResponse("This image has already expired")
