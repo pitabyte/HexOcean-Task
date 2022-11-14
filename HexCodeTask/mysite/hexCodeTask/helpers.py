@@ -5,6 +5,13 @@ def expiresIsValid(expires):
         return True
     return False
 
+def getImageURL(baseURL, filename, photo):
+    return baseURL + "static/images/user_{0}/{1}".format(photo.user.id, filename)
+
+
+
+
+
 
 
 

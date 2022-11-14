@@ -22,9 +22,13 @@ class CustomUser(AbstractUser):
     pass
     tier = models.ForeignKey(Tier, on_delete=models.DO_NOTHING, null=True)
 
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'user_{0}/{1}'.format(instance.user.id, filename)
+
 class Photo(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='photos', null=True)
-    image = models.ImageField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True, upload_to=user_directory_path)
 
     def appendURLtoResponse(self, response, baseURL):
         finalURL = baseURL + "static" + self.image.url
@@ -34,7 +38,7 @@ class Thumbnail(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='thumbnails', null=True)
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name='thumbnails', null=True)
     height = models.IntegerField(null=True)
-    url = models.CharField(max_length=20, null=True)
+    url = models.CharField(max_length=40, null=True)
 
     def appendURLtoResponse(self, response, baseURL):
         finalURL = baseURL + "thumbnail/" + str(self.id)
@@ -44,9 +48,10 @@ class Thumbnail(models.Model):
 class BinaryPhoto(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='binary', null=True)
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name='binary', null=True)
-    url = models.CharField(max_length=20, null=True)
+    url = models.CharField(max_length=40, null=True)
     expires = models.IntegerField(validators=[MinValueValidator(30), MaxValueValidator(30000)])
     date = models.DateTimeField(auto_now_add=True, null=True)
+    path = models.CharField(max_length=100, null=True)
 
     
     def appendURLtoResponse(self, response, baseURL):
