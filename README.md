@@ -1,8 +1,8 @@
-# HexCode recruitment task
+# HexOcean recruitment task
 
 ## How to run
 
-After cloning the project open command prompt, and navigate to project's root directory (Hex-Code-Task) and execute:
+After cloning the project open command prompt, and navigate to project's root directory (HexOcean-Task) and execute:
 
 ```bash
 # Navigate to 'mysite' directory ("/../Hex-Code-Task/HexCodeTask/mysite"):
@@ -52,9 +52,9 @@ username: dawid <b>/</b> password: dawid </br>
 
 ### GET:
 
-#### http://127.0.0.1:8000/all/ - Lists all images of a specified user. In request body:
+#### http://127.0.0.1:8000/all/<str:username> - Lists all images of a specified user. In request body:
 
-'username' -> username
+'username' -> username (eg. "adam")
 
 #### http://127.0.0.1:8000/binary/{id} - Returns a binary image (if exists)
 
