@@ -24,7 +24,7 @@ username: admin <b>/</b> password: admin
 ### 'Basic', 'Premium' and 'Enterprise' tiers are already created. You can add custom tiers in admin interface. </br>
 #### To do so specify following parameters: </br>
 <b>'name'</b> - tier name </br>
-<b>'heights'</b> - add thumbnail heights as space-separated values (eg. 100 500 1000) </br>
+<b>'heights'</b> - add thumbnail heights as space-separated values (eg. 100 500 1000) <b> <- IMPORTANT!</b> </br>
 <b>'gets-original'</b> - gets a link to the original photo after upload </br>
 <b>'expiring-link'</b> - ability to get an expiring link to a binary photo after upload </br>
 
@@ -41,7 +41,7 @@ username: dawid <b>/</b> password: dawid </br>
 
 ### POST:
 
-#### http://127.0.0.1:8000/upload/ - Returns links to images based on a user's tier. 
+#### http://127.0.0.1:8000/upload/ - Returns links to images based on the user's tier. 
 
 #### Send photos via Postman using following key-value pairs in form-data body:
 
@@ -53,7 +53,7 @@ username: dawid <b>/</b> password: dawid </br>
 ### GET:
 
 #### http://127.0.0.1:8000/all/{username} - Lists all images of a specified user. </br>
-eg. http://127.0.0.1:8000/all/adam
+eg. http://127.0.0.1:8000/all/ewa
 
 #### http://127.0.0.1:8000/binary/{id} - Returns a binary image (if exists)
 
