@@ -22,9 +22,9 @@ $ python3 manage.py runserver
 
 #### http://127.0.0.1:8000/upload/ - send images via Postman using following key-value pair in form-data body:
 
-'images' -> select files to upload
-'username' -> username (e.g. adam)
-'expires' -> value from 30 to 30000 (used to create a binary photo)
+#### 'images' -> select files to upload
+#### 'username' -> username (e.g. adam)
+#### 'expires' -> value from 30 to 30000 (used to create a binary photo)
 
 
 ### GET:
