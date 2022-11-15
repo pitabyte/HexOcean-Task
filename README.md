@@ -2,10 +2,10 @@
 
 ## How to run
 
-After cloning the project open command prompt, and navigate to project's root directory (HexCodeTask) and execute:
+After cloning the project open command prompt, and navigate to project's root directory (Hex-Code-Task) and execute:
 
 ```bash
-# Navigate to 'mysite' directory ("/../HexCodeTask/HexCodeTask/mysite"):
+# Navigate to 'mysite' directory ("/../Hex-Code-Task/HexCodeTask/mysite"):
 $ cd HexCodeTask/mysite
 
 # Install dependencies:
