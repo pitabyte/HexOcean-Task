@@ -15,6 +15,10 @@ $ pip install -r requirements.txt
 $ python3 manage.py runserver 
 
 ```
+## Admin interface
+
+#### To access admin interface go to 'http://127.0.0.1:8000/admin/' and use following credentials:
+username: admin <b>/</b> password: admin
 
 ## Tiers
 ### 'Basic', 'Premium' and 'Enterprise' tiers are already created. You can add custom tiers in admin interface. </br>
@@ -25,8 +29,6 @@ $ python3 manage.py runserver
 <b>'expiring-link'</b> - ability to get an expiring link to a binary photo after upload </br>
 
 ## Users
-#### admin-user:
-username: admin <b>/</b> password: admin
 
 #### Following users are already created, each with 'Basic', 'Premium' and 'Enterprise' tier accordingly: <br>
 username: adam <b>/</b> password: adam </br>
