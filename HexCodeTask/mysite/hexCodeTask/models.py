@@ -10,7 +10,6 @@ class Tier(models.Model):
     name = models.CharField(max_length=20)
     heights = models.CharField(max_length=20)
     gets_original = models.BooleanField(null=True)
-    gets_link = models.BooleanField(null=True)
     expiring_link = models.BooleanField(null=True)
 
     def __str__(self):
@@ -42,17 +41,17 @@ class Photo(models.Model):
             filename = "B-" + self.getFilename()
         return filename
 
-    def appendURLtoResponse(self, response, baseURL):
-        finalURL = baseURL + "static" + self.image.url
-        response['original'] = finalURL
-
-    def createThumbnailFile(self, height):
+    def createThumbnail(self, height, baseURL):
         image = Image.open(self.image.path)
         ratio = image.width / image.height
         MAX_SIZE = (float(height) * ratio, int(height))
         image.thumbnail(MAX_SIZE)
         path = self.getNewPath(height)
         image.save(path, format='JPEG')
+        url = self.getNewURL(baseURL, height)
+        thumbnail = Thumbnail(user=self.user, photo=self, height=height, url=url)
+        thumbnail.save()
+        return thumbnail
 
     def getNewPath(self, height=None):
         if height:
@@ -63,19 +62,19 @@ class Photo(models.Model):
         path = dir + "/" + filename
         return path
         
-    def getNewURL(self, baseURL, height=None):
-        if height:
-            filename = self.getNewFilename(height)
-        else:
-            filename = self.getNewFilename()
+    def getNewURL(self, baseURL, height):
+        filename = self.getNewFilename(height)
         return baseURL + "static/images/user_{0}/{1}".format(self.user.id, filename)
 
-    def createBinary(self, user):
+    def createBinary(self, expires, baseURL):
         image = Image.open(self.image.path)
         grayImage = ImageOps.grayscale(image)
         path = self.getNewPath()
         grayImage.save(path, format='JPEG')
-        binaryPhoto = BinaryPhoto(user=user, photo=self, path=path)
+        binaryPhoto = BinaryPhoto(user=self.user, photo=self, path=path)
+        binaryPhoto.save()
+        binaryPhoto.url = binaryPhoto.getURL(baseURL)
+        binaryPhoto.expires = expires
         binaryPhoto.save()
         return binaryPhoto
     
@@ -88,11 +87,6 @@ class Thumbnail(models.Model):
     height = models.IntegerField(null=True)
     url = models.CharField(max_length=40, null=True)
 
-    def appendURLtoResponse(self, response, baseURL):
-        finalURL = baseURL + "thumbnail/" + str(self.id)
-        key = "thumbnail" + str(self.height)
-        response[key] = finalURL
-
 
 class BinaryPhoto(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='binary', null=True)
@@ -102,10 +96,6 @@ class BinaryPhoto(models.Model):
     date = models.DateTimeField(auto_now_add=True, null=True)
     path = models.CharField(max_length=100, null=True)
 
-    
-    def appendURLtoResponse(self, response, baseURL):
-        finalURL = baseURL + "binary/" + str(self.id)
-        response['binary'] = finalURL
 
     def getURL(self, baseURL):
         return baseURL + "binary/" + str(self.id)

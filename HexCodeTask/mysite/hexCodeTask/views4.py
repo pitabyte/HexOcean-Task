@@ -13,7 +13,7 @@ import json
 import io
 from datetime import timezone, timedelta, datetime
 from django.http import JsonResponse
-from hexCodeTask.validators import expiresIsValid, extensionIsValid, uploadPhotosRequestIsValid
+from hexCodeTask.helpers import expiresIsValid, getImageURL, extensionIsValid
 import os
 # Create your views here.
 
@@ -40,16 +40,15 @@ def getPhotos(request):
 @api_view(['POST'])
 def uploadPhotos(request):
     data = request.data
-    if not uploadPhotosRequestIsValid(request, data) == True:
-        return uploadPhotosRequestIsValid(request, data)
     user = CustomUser.objects.get(username=data['username'])
+
     response = {}
     responseList = []
     baseURL = request.build_absolute_uri('/')
     photos = request.FILES.getlist('photos')
 
     for photo_data in photos:
-        photo = Photo(user=user, image=photo_data)
+        
         photo.save()
 
         heights = user.tier.get_heights_list()
