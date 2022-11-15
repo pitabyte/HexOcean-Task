@@ -92,7 +92,7 @@ class BinaryPhoto(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='binary', null=True)
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name='binary', null=True)
     url = models.CharField(max_length=40, null=True)
-    expires = models.IntegerField(validators=[MinValueValidator(30), MaxValueValidator(30000)], null=True)
+    expires = models.IntegerField(validators=[MinValueValidator(300), MaxValueValidator(30000)], null=True)
     date = models.DateTimeField(auto_now_add=True, null=True)
     path = models.CharField(max_length=100, null=True)
 

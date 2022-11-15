@@ -28,7 +28,7 @@ class PhotoTestCase(APITestCase):
     def test_expiresIsValid(self):
         self.assertEqual(expiresIsValid(10), False)
         self.assertEqual(expiresIsValid(35000), False)
-        self.assertEqual(expiresIsValid(50), True)
+        self.assertEqual(expiresIsValid(500), True)
 
     def test_extensionIsValid(self):
         self.assertEqual(extensionIsValid('photo.txt'), False)
