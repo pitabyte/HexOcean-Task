@@ -5,7 +5,7 @@
 After cloning the project open command prompt, and navigate to project's root directory (HexOcean-Task) and execute:
 
 ```bash
-# Navigate to 'mysite' directory ("/../Hex-Code-Task/HexCodeTask/mysite"):
+# Navigate to 'mysite' directory ("/../HexOcean-Task/HexCodeTask/mysite"):
 $ cd HexCodeTask/mysite
 
 # Install dependencies:
@@ -52,9 +52,8 @@ username: dawid <b>/</b> password: dawid </br>
 
 ### GET:
 
-#### http://127.0.0.1:8000/all/<str:username> - Lists all images of a specified user. In request body:
-
-'username' -> username (eg. "adam")
+#### http://127.0.0.1:8000/all/{username} - Lists all images of a specified user. </br>
+eg. http://127.0.0.1:8000/all/adam
 
 #### http://127.0.0.1:8000/binary/{id} - Returns a binary image (if exists)
 
