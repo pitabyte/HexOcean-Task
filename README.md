@@ -2,11 +2,11 @@
 
 ## How to run
 
-After cloning the project open command prompt, navigate to project's root directory (HexCodeTask) and execute:
+After cloning the project open command prompt, and navigate to project's root directory (HexCodeTask) and execute:
 
 ```bash
-# Navigate to 'mysite' directory ("/../HexCodeTask/mysite"):
-$ cd mysite
+# Navigate to 'mysite' directory ("/../HexCodeTask/HexCodeTask/mysite"):
+$ cd HexCodeTask/mysite
 
 # Install dependencies:
 $ pip install -r requirements.txt
