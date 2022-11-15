@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse, FileResponse
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view
 from rest_framework import status
 from .models import Photo, CustomUser, Thumbnail, BinaryPhoto
 from .serializers import PhotoSerializer, ThumbnailSerializer, BinaryPhotoSerializer
@@ -18,11 +18,10 @@ import os
 # Create your views here.
 
 @api_view(['GET'])
-def getPhotos(request):
-    data = request.data
-    if not 'username' in data:
-        return Response('Specify "username" in request body', status=status.HTTP_400_BAD_REQUEST)
-    user = CustomUser.objects.get(username=data['username'])
+def getPhotos(request, username):
+    if not CustomUser.objects.filter(username=username).exists():
+        return Response("This user doesn't exist", status=status.HTTP_404_NOT_FOUND)
+    user = CustomUser.objects.get(username=username)
     response = []
     baseURL = request.build_absolute_uri('/')
     photos = Photo.objects.filter(user=user)
@@ -40,8 +39,8 @@ def getPhotos(request):
 @api_view(['POST'])
 def uploadPhotos(request):
     data = request.data
-    if not uploadPhotosRequestIsValid(request, data) == True:
-        return uploadPhotosRequestIsValid(request, data)
+    if not uploadPhotosRequestIsValid(request) == True:
+        return uploadPhotosRequestIsValid(request)
     user = CustomUser.objects.get(username=data['username'])
     response = {}
     responseList = []
@@ -81,9 +80,12 @@ def getBinaryPhoto(request, id):
     difference = (datetime.now(timezone.utc) - binaryPhoto.date).total_seconds()
 
     if (difference < binaryPhoto.expires):
-        img = open(binaryPhoto.path, 'rb')
-        response = FileResponse(img)
-        return response
+        try:
+            img = open(binaryPhoto.path, 'rb')
+            response = FileResponse(img)
+            return response
+        except IOError:
+            return HttpResponse("File not found", status=status.HTTP_404_NOT_FOUND)
     else:
         os.remove(binaryPhoto.path)
         binaryPhoto.delete()

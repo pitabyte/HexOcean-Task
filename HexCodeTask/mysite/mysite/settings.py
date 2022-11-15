@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -140,3 +141,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if 'test' in sys.argv :
+    # store files in memory, no cleanup after tests are finished
+    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+    # much faster password hashing, default one is super slow (on purpose)
+    PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
