@@ -21,8 +21,8 @@ $ python3 manage.py runserver
 username: admin <b>/</b> password: admin
 
 ## Tiers
-### 'Basic', 'Premium' and 'Enterprise' tiers are already created. You can add custom tiers in admin interface. </br>
-#### To do so specify following parameters: </br>
+### 'Basic', 'Premium' and 'Enterprise' tiers are already created. 
+#### You can add custom tiers in admin interface. To do so specify following parameters: </br>
 <b>'name'</b> - tier name </br>
 <b>'heights'</b> - add thumbnail heights as space-separated values (eg. 100 500 1000) <b> <- IMPORTANT!</b> </br>
 <b>'gets-original'</b> - gets a link to the original photo after upload </br>
@@ -47,7 +47,7 @@ username: dawid <b>/</b> password: dawid </br>
 
 'photos' -> select files to upload </br>
 'username' -> username (e.g. adam) </br>
-'expires' -> value from 30 to 30000 (used to create a binary photo) </br>
+'expires' -> value from 300 to 30000 (used to create a binary photo) </br>
 
 
 ### GET:
