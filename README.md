@@ -22,7 +22,7 @@ username: admin <b>/</b> password: admin
 
 ## Tiers
 ### 'Basic', 'Premium' and 'Enterprise' tiers are already created. You can add custom tiers in admin interface. </br>
-#### To do so go to specify following parameters: </br>
+#### To do so specify following parameters: </br>
 <b>'name'</b> - tier name </br>
 <b>'heights'</b> - add thumbnail heights as space-separated values (eg. 100 500 1000) </br>
 <b>'gets-original'</b> - gets a link to the original photo after upload </br>
