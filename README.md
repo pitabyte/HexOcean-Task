@@ -61,8 +61,6 @@ eg. http://127.0.0.1:8000/all/ewa
 
 #### http://127.0.0.1:8000/binary/{id} - Returns a binary image (if exists)
 <br />
-Time to complete: 15-20 hours
-
 
 
 
