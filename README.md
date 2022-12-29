@@ -1,4 +1,8 @@
-# HexOcean recruitment task
+# Photo Manager API
+
+## About
+
+Allows users to upload photos and get (according to their user tier) thumbnails of a specified size / black-and-white photos / expiring link to a photo.
 
 ## How to run
 
